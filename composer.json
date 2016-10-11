@@ -23,12 +23,19 @@
   "homepage": "https://blog-tree.com",
   "autoload": {
     "psr-4": {
-      "zagovorichev\\laravel\\languages\\": "src"
+      "Zagovorichev\\Laravel\\Languages\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "zagovorichev\\laravel\\tests\\": "tests"
+      "Zagovorichev\\Laravel\\tests\\": "tests/"
     }
+  },
+  "require": {
+    "php": ">=5.6.4",
+    "illuminate/http": "^5.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.6"
   }
 }
