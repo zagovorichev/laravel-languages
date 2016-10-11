@@ -23,7 +23,7 @@
   "homepage": "https://blog-tree.com",
   "autoload": {
     "psr-4": {
-      "zagovorichev\\laravel\\languages": "src"
+      "zagovorichev\\laravel\\languages\\": "src"
     }
   },
   "autoload-dev": {
