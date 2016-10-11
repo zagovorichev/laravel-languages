@@ -1,0 +1,34 @@
+{
+  "name": "zagovorichev/laravel-languages",
+  "description": "Using different languages in the Laravel",
+  "minimum-stability": "dev",
+  "license": ["MIT"],
+  "authors": [
+    {
+      "name": "Alexander Zagovorichev",
+      "email": "zagovorichev@gmail.com"
+    }
+  ],
+  "support": {
+    "blog": "https://blog-tree.com"
+  },
+  "keywords": [
+    "laravel",
+    "translate",
+    "localization",
+    "domain",
+    "cookie",
+    "session"
+  ],
+  "homepage": "https://blog-tree.com",
+  "autoload": {
+    "psr-4": {
+      "zagovorichev\\laravel\\languages": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "zagovorichev\\laravel\\tests\\": "tests"
+    }
+  }
+}
