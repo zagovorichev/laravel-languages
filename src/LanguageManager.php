@@ -58,7 +58,7 @@ class LanguageManager
         }
 
         if ($this->config->has('modes')) {
-            $this->defaultLanguage = $this->config->get('modes');
+            $this->modes = $this->config->get('modes');
         }
 
         if ($this->config->has('languages')) {
