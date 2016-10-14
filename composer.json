@@ -28,7 +28,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Zagovorichev\\Laravel\\tests\\": "tests/"
+      "Zagovorichev\\Laravel\\Languages\\tests\\": "tests/"
     }
   },
   "require": {
