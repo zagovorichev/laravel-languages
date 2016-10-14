@@ -14,7 +14,6 @@ namespace zagovorichev\laravel\languages\Http\Middleware;
 
 
 use Closure;
-use Illuminate\Http\Request;
 
 class LanguagesMiddleware
 {

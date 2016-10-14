@@ -13,24 +13,82 @@
 namespace Zagovorichev\Laravel\Languages;
 
 
+/**
+ * Provides managing for the different languages
+ *
+ * Class LanguageManager
+ * @package Zagovorichev\Laravel\Languages
+ */
 class LanguageManager
 {
+    /**
+     * If nothing defined yet, use default
+     * @var string
+     */
     private $defaultLanguage = 'en';
 
-    public function __construct()
+    /** @var \Illuminate\Config\Repository */
+    private $config;
+
+    /**
+     * Allowed languages
+     *
+     * @var array
+     */
+    private $languages = ['en'];
+
+    /**
+     * Modes for the languages
+     *
+     * can be changed through
+     *
+     * @var array
+     */
+    private $modes = [
+        'session',
+        'cookies'
+    ];
+
+    public function __construct($config)
     {
-        $config = config('');
-        //$this->defaultLanguage =
+        $this->config = $config;
+
+        if ($this->config->has('default_language')) {
+            $this->defaultLanguage = $this->config->get('default_language');
+        }
+
+        if ($this->config->has('modes')) {
+            $this->defaultLanguage = $this->config->get('modes');
+        }
+
+        if ($this->config->has('languages')) {
+            $this->languages = $this->config->get('languages');
+        }
     }
 
     public function getLanguage()
     {
+        $lang = $this->defaultLanguage;
+
+/*
+        // set correct locale
+        if (session()->has('lang')) {
+            $lang = session()->get('lang');
+        } elseif (Cookie::has('lang')) {
+            $lang = Cookie::get('lang');
+        }*/
+
         return $lang;
     }
 
+    /**
+     * Set language
+     *
+     * @param $lang
+     */
     public function setLanguage($lang)
     {
-        $currentLang ==$this->getLanguage();
+        /*$currentLang == $this->getLanguage();
 
             session()->put('lang', $lang);
             cookie('lang', $lang);
@@ -43,6 +101,9 @@ class LanguageManager
             $path .= '?' .  http_build_query($params);
         }
 
-        return redirect($path);
+        return redirect($path);*/
+
+
+
     }
 }

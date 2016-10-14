@@ -20,10 +20,20 @@ return [
      | Will be used by default and for common pages
      | Also this language will be used if missed translation
      |
-     | For example for site.com, www.site.com
+     | For example for site.com, www.site.com without cookies and sessions
      |
     */
     'default_language' => 'en',
+
+    /*
+     |---------------------------------------------------------------
+     | List of the languages
+     |---------------------------------------------------------------
+     |
+     | Will be displayed only languages from that list
+     |
+     */
+    'languages' => ['en'],
 
     /*
      |-----------------------------------------------------------------
