@@ -23,12 +23,12 @@
   "homepage": "https://blog-tree.com",
   "autoload": {
     "psr-4": {
-      "Zagovorichev\\Laravel\\Languages\\": "src/"
+      "Zagovorichev\\Laravel\\Languages\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Zagovorichev\\Laravel\\Languages\\tests\\": "tests/"
+      "Zagovorichev\\Laravel\\Languages\\tests\\": "tests"
     }
   },
   "require": {
