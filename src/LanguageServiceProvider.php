@@ -41,6 +41,9 @@ class LanguageServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom($this->defaultConfigPath, self::CONFIG_FILENAME);
 
+        $this->registerArtisanCommands();
+
+
         $this->app->singleton('languages', function ($app) {
 
             $locale = $app['config']['app.locale'];

@@ -49,7 +49,14 @@ class LanguageManager
         'cookies'
     ];
 
-    public function __construct($config)
+    private $app;
+
+    /**
+     * LanguageManager constructor.
+     * @param $config
+     * @param $app
+     */
+    public function __construct($config, $app)
     {
         $this->config = $config;
 
@@ -64,19 +71,31 @@ class LanguageManager
         if ($this->config->has('languages')) {
             $this->languages = $this->config->get('languages');
         }
+
+        // define application
+        if (isset($app)) {
+            $this->app = $app;
+        } elseif (function_exists('app')) {
+            // try to define current application
+            // without application can't work anything
+            $this->app = app();
+        }
     }
 
     public function getLanguage()
     {
         $lang = $this->defaultLanguage;
 
-/*
-        // set correct locale
-        if (session()->has('lang')) {
-            $lang = session()->get('lang');
-        } elseif (Cookie::has('lang')) {
-            $lang = Cookie::get('lang');
-        }*/
+        //session() => app('session)
+        if (in_array('session', $this->modes) && $this->app['session']->has('lang')) {
+            $lang = $this->app['session']->get('lang');
+        } elseif (in_array('cookie', $this->modes) && $this->app['request']->cookie('lang', null)) {
+            $lang = $this->app['request']->cookie('lang', $this->defaultLanguage);
+        }
+
+        //Cookie
+        //app('request')->cookie('lang', null);
+        //app('request')->cookie('lang', default);
 
         return $lang;
     }

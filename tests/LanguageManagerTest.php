@@ -13,17 +13,26 @@
 namespace Zagovorichev\Laravel\Languages\tests;
 
 
+use Illuminate\Config\Repository;
 use Zagovorichev\Laravel\Languages\LanguageManager;
 
 class LanguageManagerTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     *
+     * test default language
      */
-    public function testGetLanguage()
+    public function testGetLanguageWithotConfig()
     {
-        $manager = new LanguageManager();
+        $conf = new Repository();
+        $manager = new LanguageManager($conf);
+        $this->assertEquals('en', $manager->getLanguage());
+    }
+
+    public function testGetLanguageFromSession()
+    {
+        $conf = new Repository();
+        $manager = new LanguageManager($conf);
         $this->assertEquals('en', $manager->getLanguage());
     }
 }
