@@ -27,6 +27,18 @@ require_once "./mocks/cookie.php";
 
 class ManagersTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Repository
+     */
+    private $config;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->config = new Repository([]);
+    }
+
     private function managerTest(LanguageManagerInterface $manager)
     {
         $this->assertFalse($manager->has());
@@ -39,9 +51,8 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
     public function testManagers()
     {
         $managers = [];
-        $conf = new Repository([]);
-        $managers[] = new SessionManager($conf, new SessionMock() );
-        $managers[] = new CookieManager($conf, CookieMock::class );
+        $managers[] = new SessionManager($this->config, new SessionMock() );
+        $managers[] = new CookieManager($this->config, CookieMock::class );
 
         foreach ($managers as $manager) {
             $this->managerTest($manager);
@@ -50,9 +61,10 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
 
     public function testRequestManager()
     {
+        $conf = new Repository([]);
         $mock = new RequestMock();
 
-        $manager = new RequestManager( $mock );
+        $manager = new RequestManager($this->config, $mock );
         $this->assertFalse($manager->has());
         $this->assertFalse($manager->get());
 
@@ -66,10 +78,10 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
         $mock = new RequestMock();
 
         // RegEx from configuration file
-        $reg = 'http://www.example.com/{\w+}/';
+        $this->config->set('pathRegExp', '([a-z]{2})/.*');
 
-        $manager = new PathManager($mock);
-        $this->assertFalse($manager->has());
-        $this->assertFalse($manager->get());
+        $manager = new PathManager($this->config, $mock);
+        $this->assertTrue($manager->has());
+        $this->assertEquals('en', $manager->get());
     }
 }
