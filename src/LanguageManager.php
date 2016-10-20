@@ -13,100 +13,144 @@
 namespace Zagovorichev\Laravel\Languages;
 
 
+use Illuminate\Config\Repository;
+use Zagovorichev\Laravel\Languages\Manager\CookieManager;
+use Zagovorichev\Laravel\Languages\Manager\DomainManager;
+use Zagovorichev\Laravel\Languages\Manager\Manager;
+use Zagovorichev\Laravel\languages\Manager\PathManager;
+use Zagovorichev\Laravel\languages\Manager\RequestManager;
+use Zagovorichev\Laravel\languages\Manager\SessionManager;
+
+
 /**
  * Provides managing for the different languages
  *
  * Class LanguageManager
  * @package Zagovorichev\Laravel\Languages
  */
-class LanguageManager
+class LanguageManager extends Manager
 {
     /**
-     * If nothing defined yet, use default
-     * @var string
-     */
-    private $defaultLanguage = 'en';
-
-    /** @var \Illuminate\Config\Repository */
-    private $config;
-
-    /**
-     * Allowed languages
+     * If user selected new language, then we need to replace all things assigned to it (all other modes)
+     * else if we can find language in session - we must use it
+     * else if ...
+     * else if we found language in domain - use it
+     * else use default language
      *
      * @var array
      */
-    private $languages = ['en'];
+    protected $modesPriority = [
+        'request', // high priority
+        'session',
+        'cookie',
+        'path',
+        'domain', // low priority
+
+    ];
+
+    /**
+     * Aliases for the language managers
+     * @var array
+     */
+    private $managersAliases = [
+        'request' => RequestManager::class,
+        'session' => SessionManager::class,
+        'cookie' => CookieManager::class,
+        'path' => PathManager::class,
+        'domain' => DomainManager::class,
+    ];
 
     /**
      * Modes for the languages
      *
-     * can be changed through
+     * can be changed through configuration
      *
      * @var array
      */
     private $modes = [
         'session',
-        'cookies'
+        'cookies',
     ];
-
-    private $app;
 
     /**
      * LanguageManager constructor.
      * @param $config
-     * @param $app
      */
-    public function __construct($config, $app)
+    public function __construct(Repository $config)
     {
-        $this->config = $config;
+        parent::__construct($config);
 
-        if ($this->config->has('default_language')) {
-            $this->defaultLanguage = $this->config->get('default_language');
-        }
-
-        if ($this->config->has('modes')) {
-            $this->modes = $this->config->get('modes');
-        }
-
-        if ($this->config->has('languages')) {
-            $this->languages = $this->config->get('languages');
-        }
-
-        // define application
-        if (isset($app)) {
-            $this->app = $app;
-        } elseif (function_exists('app')) {
-            // try to define current application
-            // without application can't work anything
-            $this->app = app();
+        if ($this->getConfig()->has('modes')) {
+            $this->setModes($this->getConfig()->get('modes'));
         }
     }
 
-    public function getLanguage()
+    private function setModes(array $modes)
     {
-        $lang = $this->defaultLanguage;
+        $this->modes = $this->sortModes($modes);
+        $this->checkModes();
+    }
 
-        //session() => app('session)
-        if (in_array('session', $this->modes) && $this->app['session']->has('lang')) {
-            $lang = $this->app['session']->get('lang');
-        } elseif (in_array('cookie', $this->modes) && $this->app['request']->cookie('lang', null)) {
-            $lang = $this->app['request']->cookie('lang', $this->defaultLanguage);
+    private function sortModes($modes)
+    {
+        $sorted = [];
+        foreach ($this->modesPriority as $mode) {
+            if (in_array($mode, $modes)) {
+                $sorted[] = $mode;
+            }
         }
 
-        //Cookie
-        //app('request')->cookie('lang', null);
-        //app('request')->cookie('lang', default);
+        return $sorted;
+    }
+
+    /**
+     * Check modes and exclude modes which can't be used
+     * (for example if not defined cookie() - we can't set lang in the cookie)
+     */
+    private function checkModes()
+    {
+        if (in_array('cookie', $this->modes) && !function_exists('cookie')) {
+            unset($this->modes['cookie']);
+            throw new LanguageManagerException('Function cookie() not defined (turn it on or switch off cookie mode)');
+        }
+    }
+
+    /**
+     * @param $key
+     * @return Manager
+     */
+    private function getManager($key)
+    {
+        $alias = $this->managersAliases[$key];
+
+        /** @var Manager $manager */
+        $manager = new $alias;
+        $manager->setConfig($this->getConfig());
+
+        return $manager;
+    }
+
+    public function get()
+    {
+        $lang = false;
+        foreach ($this->modes as $mode) {
+            $lang = $this->getManager($mode)->get();
+            if ($lang) {
+                break;
+            }
+        }
+
+        if (!$lang) {
+            $lang = $this->getDefaultLanguage();
+        }
 
         return $lang;
     }
 
-    /**
-     * Set language
-     *
-     * @param $lang
-     */
-    public function setLanguage($lang)
+    public function set($lang = '')
     {
+
+
         /*$currentLang == $this->getLanguage();
 
             session()->put('lang', $lang);
@@ -121,8 +165,10 @@ class LanguageManager
         }
 
         return redirect($path);*/
+    }
 
-
+    public function has()
+    {
 
     }
 }

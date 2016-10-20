@@ -19,6 +19,8 @@ class LanguageServiceProvider extends ServiceProvider
 {
     const CONFIG_FILENAME = 'ide-helper.php';
 
+    protected $defer = false;
+
     /**
      * @var string
      */

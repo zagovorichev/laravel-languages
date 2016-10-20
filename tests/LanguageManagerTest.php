@@ -22,17 +22,23 @@ class LanguageManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * test default language
      */
-    public function testGetLanguageWithotConfig()
+    public function testGetLanguageWithoutConfig()
     {
         $conf = new Repository();
-        $manager = new LanguageManager($conf);
-        $this->assertEquals('en', $manager->getLanguage());
+        $languageManager = new LanguageManager($conf);
+        $this->assertEquals('en', $languageManager->get());
     }
 
     public function testGetLanguageFromSession()
     {
-        $conf = new Repository();
-        $manager = new LanguageManager($conf);
-        $this->assertEquals('en', $manager->getLanguage());
     }
+
+    public function testGetLanguageFromCookie()
+    {
+    }
+
+    public function testGetLanguageFrom()
+    {
+    }
+
 }
