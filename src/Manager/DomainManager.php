@@ -13,20 +13,15 @@
 namespace Zagovorichev\Laravel\Languages\Manager;
 
 
-class DomainManager extends Manager
+class DomainManager extends PathManager
 {
-    public function get()
+    protected function getResource()
     {
-        // TODO: Implement getLanguage() method.
+        return $this->request->url();
     }
 
-    public function set($lang = '')
+    protected function getRegExp()
     {
-        // TODO: Implement setLanguage() method.
-    }
-
-    public function has()
-    {
-
+        return $this->getConfig()->get('domainRegExp', '');
     }
 }

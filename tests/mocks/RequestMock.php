@@ -23,8 +23,30 @@ class RequestMock
         return isset($this->storage[$name]);
     }
 
+    // 'en/bar/foo'
+    private $path = '';
+
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
     public function path()
     {
-        return 'en/bar/foo';
+        return $this->path;
+    }
+
+
+    // 'http://en.example.com/something/else'
+    private $url = '';
+
+    public function setUrl($url = '')
+    {
+        return $this->url = $url;
+    }
+
+    public function url()
+    {
+        return $this->url;
     }
 }

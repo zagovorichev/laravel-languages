@@ -17,9 +17,9 @@ use Illuminate\Config\Repository;
 use Zagovorichev\Laravel\Languages\Manager\CookieManager;
 use Zagovorichev\Laravel\Languages\Manager\DomainManager;
 use Zagovorichev\Laravel\Languages\Manager\Manager;
-use Zagovorichev\Laravel\languages\Manager\PathManager;
-use Zagovorichev\Laravel\languages\Manager\RequestManager;
-use Zagovorichev\Laravel\languages\Manager\SessionManager;
+use Zagovorichev\Laravel\Languages\Manager\PathManager;
+use Zagovorichev\Laravel\Languages\Manager\RequestManager;
+use Zagovorichev\Laravel\Languages\Manager\SessionManager;
 
 
 /**
@@ -69,7 +69,7 @@ class LanguageManager extends Manager
      */
     private $modes = [
         'session',
-        'cookies',
+        'cookie',
     ];
 
     /**
@@ -81,14 +81,8 @@ class LanguageManager extends Manager
         parent::__construct($config);
 
         if ($this->getConfig()->has('modes')) {
-            $this->setModes($this->getConfig()->get('modes'));
+            $this->modes = $this->sortModes($this->getConfig()->get('modes'));
         }
-    }
-
-    private function setModes(array $modes)
-    {
-        $this->modes = $this->sortModes($modes);
-        $this->checkModes();
     }
 
     private function sortModes($modes)
@@ -104,18 +98,6 @@ class LanguageManager extends Manager
     }
 
     /**
-     * Check modes and exclude modes which can't be used
-     * (for example if not defined cookie() - we can't set lang in the cookie)
-     */
-    private function checkModes()
-    {
-        if (in_array('cookie', $this->modes) && !function_exists('cookie')) {
-            unset($this->modes['cookie']);
-            throw new LanguageManagerException('Function cookie() not defined (turn it on or switch off cookie mode)');
-        }
-    }
-
-    /**
      * @param $key
      * @return Manager
      */
@@ -124,8 +106,7 @@ class LanguageManager extends Manager
         $alias = $this->managersAliases[$key];
 
         /** @var Manager $manager */
-        $manager = new $alias;
-        $manager->setConfig($this->getConfig());
+        $manager = new $alias($this->getConfig());
 
         return $manager;
     }
@@ -169,6 +150,14 @@ class LanguageManager extends Manager
 
     public function has()
     {
+        $lang = false;
+        foreach ($this->modes as $mode) {
+            $lang = $this->getManager($mode)->has();
+            if ($lang) {
+                break;
+            }
+        }
 
+        return $lang;
     }
 }

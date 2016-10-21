@@ -14,30 +14,28 @@ namespace Zagovorichev\Laravel\Languages\Manager;
 
 
 use Illuminate\Config\Repository;
+use Zagovorichev\Laravel\Languages\LanguageManagerException;
 
-class PathManager extends Manager
+class PathManager extends RequestManager
 {
 
-    private $request;
-
-    /**
-     * PathManager constructor.
-     * @param $request
-     * @param $config
-     */
-    public function __construct(Repository $config, $request)
+    protected function getResource()
     {
-        parent::__construct($config);
+        return $this->request->path();
+    }
 
-        $this->request = $request;
+    protected function getRegExp()
+    {
+        return $this->getConfig()->get('pathRegExp', '');
     }
 
     public function get()
     {
         $lang = false;
-        $regEx = $this->getConfig()->get('pathRegExp', '');
-        if ($d = preg_match('|'. $regEx . '|ui', $this->request->path(), $match) !== false) {
-            $lang = $this->detectLang($match[1]);
+        if (preg_match($this->getRegExp()['reg'], $this->getResource(), $match) !== false) {
+            if (isset($match[$this->getRegExp()['langPart']])) {
+                $lang = $this->detectLang($match[$this->getRegExp()['langPart']]);
+            }
         }
 
         return $lang;
@@ -46,11 +44,26 @@ class PathManager extends Manager
     /**
      * Replace part of the url with new language
      * @param string $lang
+     * @throws LanguageManagerException
      */
     public function set($lang = '')
     {
-        if (preg_match($this->getConfig()->get('pathRegExp', ''), $this->request->path(), $match) !== false) {
-            $path = preg_replace('{\w+}', $lang, $this->getConfig()->get('pathRegEx', ''));
+        $path = '';
+        if (preg_match($this->getRegExp()['reg'], $this->getResource(), $matches) !== false) {
+            foreach ($matches as $key => $match) {
+                if (!$key) {
+                    continue;
+                }
+                $path .= ($key == $this->getRegExp()['langPart']) ? $lang : $match;
+            }
+        }
+
+        if (!function_exists('redirect')) {
+            throw new LanguageManagerException('Function redirect() does not exists, can\'t go to the path ' . $path);
+        }
+
+        if (!empty($path) && function_exists('redirect')) {
+            redirect($path);
         }
     }
 

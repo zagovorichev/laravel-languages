@@ -52,8 +52,8 @@ return [
     'modes' => [
         'session',
         'cookie',
-        'domain',
         'path',
+        'domain',
     ],
 
     /*

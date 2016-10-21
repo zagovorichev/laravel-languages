@@ -15,6 +15,7 @@ namespace Zagovorichev\Laravel\Languages\Manager;
 
 use Illuminate\Config\Repository;
 use Illuminate\Support\Facades\Session;
+use Zagovorichev\Laravel\Languages\LanguageManagerException;
 
 class SessionManager extends Manager
 {
@@ -23,11 +24,20 @@ class SessionManager extends Manager
      */
     private $session;
 
-    public function __construct(Repository $config, $session)
+    public function __construct(Repository $config, $session = null)
     {
         parent::__construct($config);
 
-        $this->session = $session;
+
+        if ($session) {
+            $this->session = $session;
+        } elseif ($this->getConfig()->has('session')) {
+            $this->session = $this->getConfig()->get('session');
+        } elseif(function_exists('session')) {
+            $this->session = session();
+        } else {
+            throw new LanguageManagerException('Session did not specified [specify it through config or use session() method]');
+        }
     }
 
     public function has()

@@ -31,7 +31,6 @@ interface LanguageManagerInterface
 
     /**
      * @param string $lang
-     * @return bool
      */
     public function set($lang = '');
 

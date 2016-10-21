@@ -19,13 +19,21 @@ use Zagovorichev\Laravel\Languages\LanguageManagerException;
 class RequestManager extends Manager
 {
 
-    private $request;
+    protected $request;
 
-    public function __construct(Repository $config, $request)
+    public function __construct(Repository $config, $request = null)
     {
         parent::__construct($config);
 
-        $this->request = $request;
+        if ($request) {
+            $this->request = $request;
+        } elseif ($this->getConfig()->has('request')) {
+            $this->request = $this->getConfig()->get('request');
+        } elseif(function_exists('request')) {
+            $this->request = request();
+        } else {
+            throw new LanguageManagerException('Session did not specified [specify it through config or use session() method]');
+        }
     }
 
     public function has()

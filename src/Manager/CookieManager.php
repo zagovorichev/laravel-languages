@@ -14,6 +14,7 @@ namespace Zagovorichev\Laravel\Languages\Manager;
 
 
 use Illuminate\Support\Facades\Cookie;
+use Zagovorichev\Laravel\Languages\LanguageManagerException;
 
 class CookieManager extends Manager
 {
@@ -22,11 +23,19 @@ class CookieManager extends Manager
      */
     private $cookie;
 
-    public function __construct($config, $cookie)
+    public function __construct($config, $cookie = null)
     {
         parent::__construct($config);
 
-        $this->cookie = $cookie;
+        if ($cookie) {
+            $this->cookie = $cookie;
+        } elseif ($this->getConfig()->has('cookie')) {
+            $this->cookie = $this->getConfig()->get('cookie');
+        } elseif(function_exists('cookie')) {
+            $this->cookie = cookie();
+        } else {
+            throw new LanguageManagerException('Cookie did not specified [specify it through config or use cookie() method]');
+        }
     }
 
     public function get()
