@@ -13,97 +13,162 @@
 namespace Zagovorichev\Laravel\Languages;
 
 
+use Illuminate\Config\Repository;
+use Zagovorichev\Laravel\Languages\Manager\CookieManager;
+use Zagovorichev\Laravel\Languages\Manager\DomainManager;
+use Zagovorichev\Laravel\Languages\Manager\Manager;
+use Zagovorichev\Laravel\Languages\Manager\PathManager;
+use Zagovorichev\Laravel\Languages\Manager\RequestManager;
+use Zagovorichev\Laravel\Languages\Manager\SessionManager;
+
+
 /**
  * Provides managing for the different languages
  *
  * Class LanguageManager
  * @package Zagovorichev\Laravel\Languages
  */
-class LanguageManager
+class LanguageManager extends Manager
 {
     /**
-     * If nothing defined yet, use default
-     * @var string
-     */
-    private $defaultLanguage = 'en';
-
-    /** @var \Illuminate\Config\Repository */
-    private $config;
-
-    /**
-     * Allowed languages
+     * If user selected new language, then we need to replace all things assigned to it (all other modes)
+     * else if we can find language in session - we must use it
+     * else if ...
+     * else if we found language in domain - use it
+     * else use default language
      *
      * @var array
      */
-    private $languages = ['en'];
+    protected $modesPriority = [
+        'request', // high priority
+        'session',
+        'cookie',
+        'path',
+        'domain', // low priority
+
+    ];
+
+    /**
+     * Aliases for the language managers
+     * @var array
+     */
+    private $managersAliases = [
+        'request' => RequestManager::class,
+        'session' => SessionManager::class,
+        'cookie' => CookieManager::class,
+        'path' => PathManager::class,
+        'domain' => DomainManager::class,
+    ];
 
     /**
      * Modes for the languages
      *
-     * can be changed through
+     * can be changed through configuration
      *
      * @var array
      */
     private $modes = [
         'session',
-        'cookies'
+        'cookie',
     ];
 
-    public function __construct($config)
+    /**
+     * LanguageManager constructor.
+     * @param $config
+     */
+    public function __construct(Repository $config)
     {
-        $this->config = $config;
+        parent::__construct($config);
 
-        if ($this->config->has('default_language')) {
-            $this->defaultLanguage = $this->config->get('default_language');
-        }
-
-        if ($this->config->has('modes')) {
-            $this->modes = $this->config->get('modes');
-        }
-
-        if ($this->config->has('languages')) {
-            $this->languages = $this->config->get('languages');
+        if ($this->getConfig()->has('modes')) {
+            $this->modes = $this->sortModes($this->getConfig()->get('modes'));
         }
     }
 
-    public function getLanguage()
+    private function sortModes($modes)
     {
-        $lang = $this->defaultLanguage;
+        $sorted = [];
+        foreach ($this->modesPriority as $mode) {
+            if (in_array($mode, $modes)) {
+                $sorted[] = $mode;
+            }
+        }
 
-/*
-        // set correct locale
-        if (session()->has('lang')) {
-            $lang = session()->get('lang');
-        } elseif (Cookie::has('lang')) {
-            $lang = Cookie::get('lang');
-        }*/
+        return $sorted;
+    }
+
+    private $managers = [];
+
+    /**
+     * @param $key
+     * @return Manager
+     */
+    private function getManager($key)
+    {
+        if (!isset($this->managers[$key])) {
+            $alias = $this->managersAliases[$key];
+
+            /** @var Manager $manager */
+            $this->managers[$key] = new $alias($this->getConfig());
+        }
+
+        return $this->managers[$key];
+    }
+
+    public function get()
+    {
+        $lang = false;
+        foreach ($this->modes as $mode) {
+            $lang = $this->getManager($mode)->get();
+            if ($lang) {
+                break;
+            }
+        }
+
+        if (!$lang) {
+            $lang = $this->getDefaultLanguage();
+        }
 
         return $lang;
     }
 
-    /**
-     * Set language
-     *
-     * @param $lang
-     */
-    public function setLanguage($lang)
+    protected function filterLang($lang)
     {
-        /*$currentLang == $this->getLanguage();
+        $lang = parent::filterLang($lang);
+        return $lang ? $lang : $this->getDefaultLanguage();
+    }
 
-            session()->put('lang', $lang);
-            cookie('lang', $lang);
+    public function set($lang = '')
+    {
+        $lang = $this->filterLang($lang);
 
-            \App::setLocale($lang);
+        foreach ($this->modes as $mode) {
+            if ($mode == 'request') {
+                continue;
+            }
+            $this->getManager($mode)->set($lang);
+        }
+    }
 
-        $path = $request->path();
-        $params = $request->except(['lang']);
-        if (count($params)) {
-            $path .= '?' .  http_build_query($params);
+    public function has()
+    {
+        $lang = false;
+        foreach ($this->modes as $mode) {
+            $lang = $this->getManager($mode)->has();
+            if ($lang) {
+                break;
+            }
         }
 
-        return redirect($path);*/
+        return $lang;
+    }
 
+    public function getRedirectPath()
+    {
+        $domain = $this->getManager('domain')->getRedirectPath();
+        $path = $this->getManager('path')->getRedirectPath();
+        $request = $this->getManager('request')->getRedirectPath();
 
-
+        return $domain . $path . $request;
     }
 }

@@ -13,17 +13,218 @@
 namespace Zagovorichev\Laravel\Languages\tests;
 
 
+use Illuminate\Config\Repository;
 use Zagovorichev\Laravel\Languages\LanguageManager;
+use Zagovorichev\Laravel\Languages\LanguageManagerInterface;
+use Zagovorichev\Laravel\Languages\Manager\DomainManager;
+use Zagovorichev\Laravel\Languages\Manager\PathManager;
+use Zagovorichev\Laravel\Languages\tests\mocks\CookieMock;
+use Zagovorichev\Laravel\Languages\tests\mocks\RequestMock;
+use Zagovorichev\Laravel\Languages\tests\mocks\SessionMock;
+
+require_once __DIR__ . "/mocks/cookie.php";
 
 class LanguageManagerTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     *
-     */
-    public function testGetLanguage()
+    private $session;
+
+    private $cookie;
+
+    private $config;
+
+    private $request;
+
+    public function setUp()
     {
-        $manager = new LanguageManager();
-        $this->assertEquals('en', $manager->getLanguage());
+        parent::setUp();
+
+        CookieMock::clean();
+
+        $this->session = new SessionMock();
+        $this->cookie = CookieMock::class;
+        $this->request = new RequestMock();
+
+        $this->config = new Repository();
+        $this->config->set('session', $this->session);
+        $this->config->set('cookie', $this->cookie);
+        $this->config->set('request', $this->request);
+        $this->config->set('languages', ['en', 'es', 'ua', 'de', 'az', 'ge', 'eg', 'ch', 'it']);
+    }
+
+    /**
+     * test default language
+     */
+    public function testGetLanguageWithoutConfig()
+    {
+        $languageManager = new LanguageManager($this->config);
+        $this->assertEquals('en', $languageManager->get());
+    }
+
+    public function testDomainLanguage()
+    {
+        $this->config->set('modes', [
+            'cookie',
+            'domain',
+            'session',
+        ]);
+
+        $this->request->setUrl('http://es.example.com/something/else');
+
+        // RegEx from configuration file
+        $this->config->set('domainRegExp', [
+            'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+            'langPart' => 2
+        ]);
+
+        $languageManager = new LanguageManager($this->config);
+        $this->assertTrue($languageManager->has());
+        $this->assertEquals('es', $languageManager->get());
+    }
+
+    public function testGetLanguageFromPath()
+    {
+        $this->config->set('modes', [
+            'cookie',
+            'path',
+            'domain',
+            'session',
+        ]);
+
+        $this->request->setUrl('http://es.example.com/something/else');
+
+        // RegEx from configuration file
+        $this->config->set('domainRegExp', [
+            'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+            'langPart' => 2
+        ]);
+
+        $this->request->setPath('ua/bar/foo');
+
+        // RegEx from configuration file
+        $this->config->set('pathRegExp', [
+            'reg' => '|([a-z]{2})(/.*)|ui',
+            'langPart' => 1,
+        ]);
+
+        $languageManager = new LanguageManager($this->config);
+        $this->assertTrue($languageManager->has());
+        $this->assertEquals('ua', $languageManager->get());
+    }
+
+    public function testGetLanguageFromCookie()
+    {
+        $this->config->set('modes', [
+            'cookie',
+            'path',
+            'domain',
+            'session',
+        ]);
+
+        $this->request->setUrl('http://es.example.com/something/else');
+
+        // RegEx from configuration file
+        $this->config->set('domainRegExp', [
+            'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+            'langPart' => 2
+        ]);
+
+        $this->request->setPath('ua/bar/foo');
+
+        // RegEx from configuration file
+        $this->config->set('pathRegExp', [
+            'reg' => '|([a-z]{2})(/.*)|ui',
+            'langPart' => 1,
+        ]);
+
+        cookie(LanguageManagerInterface::LANG, 'ch');
+
+        $languageManager = new LanguageManager($this->config);
+        $this->assertTrue($languageManager->has());
+        $this->assertEquals('ch', $languageManager->get());
+    }
+
+    public function testGetLanguageFromSession()
+    {
+        $this->config->set('modes', [
+            'cookie',
+            'path',
+            'domain',
+            'session',
+        ]);
+
+        $this->request->setUrl('http://es.example.com/something/else');
+
+        // RegEx from configuration file
+        $this->config->set('domainRegExp', [
+            'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+            'langPart' => 2
+        ]);
+
+        $this->request->setPath('ua/bar/foo');
+
+        // RegEx from configuration file
+        $this->config->set('pathRegExp', [
+            'reg' => '|([a-z]{2})(/.*)|ui',
+            'langPart' => 1,
+        ]);
+
+        cookie(LanguageManagerInterface::LANG, 'ch');
+
+        $this->session->put(LanguageManagerInterface::LANG, 'de');
+
+        $languageManager = new LanguageManager($this->config);
+        $this->assertTrue($languageManager->has());
+        $this->assertEquals('de', $languageManager->get());
+    }
+
+    public function testSetNewLanguage()
+    {
+        $this->config->set('modes', [
+            'cookie',
+            'path',
+            'domain',
+            'session',
+            'request'
+        ]);
+
+        $this->request->setUrl('http://es.example.com/');
+
+        // RegEx from configuration file
+        $this->config->set('domainRegExp', [
+            'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+            'langPart' => 2
+        ]);
+
+        $this->request->setPath('ua/bar/foo');
+
+        // RegEx from configuration file
+        $this->config->set('pathRegExp', [
+            'reg' => '|([a-z]{2})(/.*)|ui',
+            'langPart' => 1,
+        ]);
+
+        cookie(LanguageManagerInterface::LANG, 'ch');
+
+        $this->session->put(LanguageManagerInterface::LANG, 'de');
+
+        $languageManager = new LanguageManager($this->config);
+        $this->assertTrue($languageManager->has());
+
+        $this->assertEquals('de', $this->session->get(LanguageManagerInterface::LANG, false));
+        $this->assertEquals('ch', call_user_func([$this->cookie, 'get'], LanguageManagerInterface::LANG, false));
+
+        $pathManager = new PathManager($this->config, $this->request);
+        $this->assertEquals('ua', $pathManager->get());
+
+        $domainManager = new DomainManager($this->config, $this->request);
+        $this->assertEquals('es', $domainManager->get());
+
+        $languageManager->set('it');
+
+        $this->assertEquals('it', $this->session->get(LanguageManagerInterface::LANG, false));
+        $this->assertEquals('it', call_user_func([$this->cookie, 'get'], LanguageManagerInterface::LANG, false));
+
+        $this->assertEquals('http://it.example.com/it/bar/foo?param1=1&param2=2', $languageManager->getRedirectPath());
     }
 }

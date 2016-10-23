@@ -46,11 +46,36 @@ return [
      | # session -> store in the $_SESSION
      | # cookie -> store in the browser $_COOKIES
      | # domain -> use domain name for determining current language (www.example.com, en.example.com, es.example.com...)
+     | # path -> use uri for language example.com/en/address
      |
      */
     'modes' => [
         'session',
         'cookie',
-        'domain'
-    ]
+        'path',
+        'domain',
+    ],
+
+    /*
+     |-----------------------------------------------------------------
+     | Path Manager configuration
+     |-----------------------------------------------------------------
+     |
+     | Use it if you want to use path for language detection
+     | # example: http://www.example.com/en/post/234
+     |
+     */
+     'pathRegExp' => '{\w+}\/.*',
+
+    /*
+     |-----------------------------------------------------------------
+     | Domain Manager configuration
+     |-----------------------------------------------------------------
+     |
+     | Use it if you want to use sub domain or different domain for language detection
+     | # example: http://www.example.en/post/234 => http://en.example.com/post/234
+     |
+     */
+    'domainRegExp' => 'http://{\w+}.example.com',
+
 ];

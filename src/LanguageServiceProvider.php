@@ -14,10 +14,13 @@ namespace Zagovorichev\Laravel\Languages;
 
 
 use Illuminate\Support\ServiceProvider;
+use zagovorichev\laravel\languages\Http\Middleware\LanguagesMiddleware;
 
 class LanguageServiceProvider extends ServiceProvider
 {
-    const CONFIG_FILENAME = 'ide-helper.php';
+    const CONFIG_NAME = 'languages';
+
+    protected $defer = false;
 
     /**
      * @var string
@@ -29,26 +32,41 @@ class LanguageServiceProvider extends ServiceProvider
         parent::__construct($app);
 
         $this->defaultConfigPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config'
-            . DIRECTORY_SEPARATOR . self::CONFIG_FILENAME;
+            . DIRECTORY_SEPARATOR . self::CONFIG_NAME . '.php';
+    }
+
+    public function register()
+    {
+        $this->mergeConfigFrom($this->defaultConfigPath, self::CONFIG_NAME);
+
+        $this->app->singleton('languages', function ($app) {
+
+            $manager = new LanguageManager(config(self::CONFIG_NAME));
+
+            return $manager;
+        });
     }
 
     public function boot()
     {
         $this->publishes([$this->defaultConfigPath => $this->basePath()], 'config');
+
+        $languages = $this->app['languages'];
+        $languages->enable();
+        $languages->boot();
+
+        $this->registerMiddleware(LanguagesMiddleware::class);
     }
 
-    public function register()
+    /**
+     * Register the Debugbar Middleware
+     *
+     * @param  string $middleware
+     */
+    protected function registerMiddleware($middleware)
     {
-        $this->mergeConfigFrom($this->defaultConfigPath, self::CONFIG_FILENAME);
-
-        $this->app->singleton('languages', function ($app) {
-
-            $locale = $app['config']['app.locale'];
-            $manager = new LanguageManager();
-            //$trans->setFallback($app['config']['app.fallback_locale']);
-
-            return $manager;
-        });
+        $kernel = $this->app['Illuminate\Contracts\Http\Kernel'];
+        $kernel->pushMiddleware($middleware);
     }
 
     /**
