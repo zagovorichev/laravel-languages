@@ -24,7 +24,7 @@ use Zagovorichev\Laravel\Languages\tests\mocks\CookieMock;
 use Zagovorichev\Laravel\Languages\tests\mocks\RequestMock;
 use Zagovorichev\Laravel\Languages\tests\mocks\SessionMock;
 
-require_once "./mocks/cookie.php";
+require_once __DIR__ . "/mocks/cookie.php";
 
 class ManagersTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,6 +38,7 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->config = new Repository([]);
+        CookieMock::clean();
     }
 
     private function managerTest(LanguageManagerInterface $manager)
@@ -49,15 +50,16 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($manager->has());
     }
 
-    public function testCookieSessionManagers()
+    public function testSessionManager()
     {
-        $managers = [];
-        $managers[] = new SessionManager($this->config, new SessionMock() );
-        $managers[] = new CookieManager($this->config, CookieMock::class );
+        $manager = new SessionManager($this->config, new SessionMock() );
+        $this->managerTest($manager);
+    }
 
-        foreach ($managers as $manager) {
-            $this->managerTest($manager);
-        }
+    public function testCookieManager()
+    {
+        $manager = new CookieManager($this->config, CookieMock::class );
+        $this->managerTest($manager);
     }
 
     public function testRequestManager()
@@ -73,10 +75,6 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('fr', $manager->get());
     }
 
-    /**
-     * @expectedException \Zagovorichev\Laravel\Languages\LanguageManagerException
-     * @expectedExceptionMessage Function redirect() does not exists, can't go to the path es/bar/foo
-     */
     public function testPathManager()
     {
         $mock = new RequestMock();
@@ -92,12 +90,9 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($manager->has());
         $this->assertEquals('en', $manager->get());
         $manager->set('es');
+        $this->assertEquals('es/bar/foo', $manager->getRedirectPath());
     }
 
-    /**
-     * @expectedException \Zagovorichev\Laravel\Languages\LanguageManagerException
-     * @expectedExceptionMessage Function redirect() does not exists, can't go to the path posts/es/12345/art
-     */
     public function testPathManager2()
     {
         $mock = new RequestMock();
@@ -113,12 +108,9 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($manager->has());
         $this->assertEquals('en', $manager->get());
         $manager->set('es');
+        $this->assertEquals('posts/es/12345/art', $manager->getRedirectPath());
     }
 
-    /**
-     * @expectedException \Zagovorichev\Laravel\Languages\LanguageManagerException
-     * @expectedExceptionMessage Function redirect() does not exists, can't go to the path http://es.example.com/something/else
-     */
     public function testDomainManager()
     {
         $mock = new RequestMock();
@@ -134,12 +126,9 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($manager->has());
         $this->assertEquals('en', $manager->get());
         $manager->set('es');
+        $this->assertEquals('http://es.example.com/something/else', $manager->getRedirectPath());
     }
 
-    /**
-     * @expectedException \Zagovorichev\Laravel\Languages\LanguageManagerException
-     * @expectedExceptionMessage Function redirect() does not exists, can't go to the path http://province.es.example.com/something/else
-     */
     public function testDomainManager2()
     {
         $mock = new RequestMock();
@@ -155,5 +144,6 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($manager->has());
         $this->assertEquals('en', $manager->get());
         $manager->set('es');
+        $this->assertEquals('http://province.es.example.com/something/else', $manager->getRedirectPath());
     }
 }

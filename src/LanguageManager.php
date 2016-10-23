@@ -97,18 +97,22 @@ class LanguageManager extends Manager
         return $sorted;
     }
 
+    private $managers = [];
+
     /**
      * @param $key
      * @return Manager
      */
     private function getManager($key)
     {
-        $alias = $this->managersAliases[$key];
+        if (!isset($this->managers[$key])) {
+            $alias = $this->managersAliases[$key];
 
-        /** @var Manager $manager */
-        $manager = new $alias($this->getConfig());
+            /** @var Manager $manager */
+            $this->managers[$key] = new $alias($this->getConfig());
+        }
 
-        return $manager;
+        return $this->managers[$key];
     }
 
     public function get()
@@ -128,24 +132,22 @@ class LanguageManager extends Manager
         return $lang;
     }
 
+    protected function filterLang($lang)
+    {
+        $lang = parent::filterLang($lang);
+        return $lang ? $lang : $this->getDefaultLanguage();
+    }
+
     public function set($lang = '')
     {
+        $lang = $this->filterLang($lang);
 
-
-        /*$currentLang == $this->getLanguage();
-
-            session()->put('lang', $lang);
-            cookie('lang', $lang);
-
-            \App::setLocale($lang);
-
-        $path = $request->path();
-        $params = $request->except(['lang']);
-        if (count($params)) {
-            $path .= '?' .  http_build_query($params);
+        foreach ($this->modes as $mode) {
+            if ($mode == 'request') {
+                continue;
+            }
+            $this->getManager($mode)->set($lang);
         }
-
-        return redirect($path);*/
     }
 
     public function has()
@@ -159,5 +161,14 @@ class LanguageManager extends Manager
         }
 
         return $lang;
+    }
+
+    public function getRedirectPath()
+    {
+        $domain = $this->getManager('domain')->getRedirectPath();
+        $path = $this->getManager('path')->getRedirectPath();
+        $request = $this->getManager('request')->getRedirectPath();
+
+        return $domain . $path . $request;
     }
 }

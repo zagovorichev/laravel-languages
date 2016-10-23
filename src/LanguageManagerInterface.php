@@ -35,9 +35,8 @@ interface LanguageManagerInterface
     public function set($lang = '');
 
     /**
-     * Set new configuration for languages
-     * @param Repository $config
-     * @return mixed
+     * If redirect needed for the manager
+     * @return string | false
      */
-    public function setConfig(Repository $config);
+    public function getRedirectPath();
 }

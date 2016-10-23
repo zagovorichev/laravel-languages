@@ -13,11 +13,11 @@
 namespace Zagovorichev\Laravel\Languages\Manager;
 
 
-use Illuminate\Config\Repository;
 use Zagovorichev\Laravel\Languages\LanguageManagerException;
 
 class PathManager extends RequestManager
 {
+    private $path = '';
 
     protected function getResource()
     {
@@ -34,7 +34,7 @@ class PathManager extends RequestManager
         $lang = false;
         if (preg_match($this->getRegExp()['reg'], $this->getResource(), $match) !== false) {
             if (isset($match[$this->getRegExp()['langPart']])) {
-                $lang = $this->detectLang($match[$this->getRegExp()['langPart']]);
+                $lang = $this->filterLang($match[$this->getRegExp()['langPart']]);
             }
         }
 
@@ -58,13 +58,12 @@ class PathManager extends RequestManager
             }
         }
 
-        if (!function_exists('redirect')) {
-            throw new LanguageManagerException('Function redirect() does not exists, can\'t go to the path ' . $path);
-        }
+        $this->path = $path;
+    }
 
-        if (!empty($path) && function_exists('redirect')) {
-            redirect($path);
-        }
+    public function getRedirectPath()
+    {
+        return $this->path;
     }
 
     public function has()

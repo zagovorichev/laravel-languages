@@ -49,4 +49,9 @@ class RequestMock
     {
         return $this->url;
     }
+
+    public function except()
+    {
+        return ['param1' => '1', 'param2' => 2];
+    }
 }

@@ -52,7 +52,7 @@ abstract class Manager implements LanguageManagerInterface
         }
     }
 
-    public function setConfig(Repository $config)
+    private function setConfig(Repository $config)
     {
         $this->config = $config;
     }
@@ -82,12 +82,17 @@ abstract class Manager implements LanguageManagerInterface
         return $this->languages;
     }
 
-    public function detectLang($lang)
+    protected function filterLang($lang)
     {
         if (!in_array($lang, $this->getLanguages())) {
             $lang = false;
         }
 
         return $lang;
+    }
+
+    public function getRedirectPath()
+    {
+        return $this->redirectPath;
     }
 }

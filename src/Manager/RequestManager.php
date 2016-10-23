@@ -32,7 +32,7 @@ class RequestManager extends Manager
         } elseif(function_exists('request')) {
             $this->request = request();
         } else {
-            throw new LanguageManagerException('Session did not specified [specify it through config or use session() method]');
+            throw new LanguageManagerException('Request did not specified [specify it through config or use session() method]');
         }
     }
 
@@ -49,5 +49,11 @@ class RequestManager extends Manager
     public function set($lang = '')
     {
         throw new LanguageManagerException('Request data can\'t be set from backend');
+    }
+
+    public function getRedirectPath()
+    {
+        $params = $this->request->except(['lang']);
+        return '?' . http_build_query($params);
     }
 }

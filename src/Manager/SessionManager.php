@@ -28,7 +28,6 @@ class SessionManager extends Manager
     {
         parent::__construct($config);
 
-
         if ($session) {
             $this->session = $session;
         } elseif ($this->getConfig()->has('session')) {
