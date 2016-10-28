@@ -54,6 +54,6 @@ class RequestManager extends Manager
     public function getRedirectPath()
     {
         $params = $this->request->except(['lang']);
-        return '?' . http_build_query($params);
+        return count($params) ? '?' . http_build_query($params) : '';
     }
 }

@@ -73,7 +73,7 @@ class LanguageManagerTest extends \PHPUnit_Framework_TestCase
 
         // RegEx from configuration file
         $this->config->set('domainRegExp', [
-            'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+            'reg' => '|^(http://)([a-z]{2})([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
             'langPart' => 2
         ]);
 
@@ -95,7 +95,7 @@ class LanguageManagerTest extends \PHPUnit_Framework_TestCase
 
         // RegEx from configuration file
         $this->config->set('domainRegExp', [
-            'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+            'reg' => '|^(http://)([a-z]{2})([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
             'langPart' => 2
         ]);
 
@@ -125,7 +125,7 @@ class LanguageManagerTest extends \PHPUnit_Framework_TestCase
 
         // RegEx from configuration file
         $this->config->set('domainRegExp', [
-            'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+            'reg' => '|^(http://)([a-z]{2})([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
             'langPart' => 2
         ]);
 
@@ -157,7 +157,7 @@ class LanguageManagerTest extends \PHPUnit_Framework_TestCase
 
         // RegEx from configuration file
         $this->config->set('domainRegExp', [
-            'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+            'reg' => '|^(http://)([a-z]{2})([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
             'langPart' => 2
         ]);
 
@@ -192,7 +192,7 @@ class LanguageManagerTest extends \PHPUnit_Framework_TestCase
 
         // RegEx from configuration file
         $this->config->set('domainRegExp', [
-            'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+            'reg' => '|^(http://)([a-z]{2})([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
             'langPart' => 2
         ]);
 

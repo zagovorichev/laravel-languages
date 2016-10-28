@@ -32,7 +32,7 @@ class CookieManager extends Manager
         } elseif ($this->getConfig()->has('cookie')) {
             $this->cookie = $this->getConfig()->get('cookie');
         } elseif(function_exists('cookie')) {
-            $this->cookie = cookie();
+            $this->cookie = Cookie::class;
         } else {
             throw new LanguageManagerException('Cookie did not specified [specify it through config or use cookie() method]');
         }

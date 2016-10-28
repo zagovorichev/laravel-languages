@@ -82,7 +82,7 @@ abstract class Manager implements LanguageManagerInterface
         return $this->languages;
     }
 
-    protected function filterLang($lang)
+    public function filterLang($lang)
     {
         if (!in_array($lang, $this->getLanguages())) {
             $lang = false;

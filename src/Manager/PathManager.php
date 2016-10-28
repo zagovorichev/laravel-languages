@@ -17,7 +17,7 @@ use Zagovorichev\Laravel\Languages\LanguageManagerException;
 
 class PathManager extends RequestManager
 {
-    private $path = '';
+    protected $path = '';
 
     protected function getResource()
     {
@@ -26,13 +26,13 @@ class PathManager extends RequestManager
 
     protected function getRegExp()
     {
-        return $this->getConfig()->get('pathRegExp', '');
+        return $this->getConfig()->get('pathRegExp', false);
     }
 
     public function get()
     {
         $lang = false;
-        if (preg_match($this->getRegExp()['reg'], $this->getResource(), $match) !== false) {
+        if ($this->getRegExp() && !empty($this->getRegExp()['reg']) && preg_match($this->getRegExp()['reg'], $this->getResource(), $match) !== false) {
             if (isset($match[$this->getRegExp()['langPart']])) {
                 $lang = $this->filterLang($match[$this->getRegExp()['langPart']]);
             }
@@ -54,11 +54,16 @@ class PathManager extends RequestManager
                 if (!$key) {
                     continue;
                 }
-                $path .= ($key == $this->getRegExp()['langPart']) ? $lang : $match;
+                $path .= ($key == $this->getRegExp()['langPart']) ? $lang . $this->separator() : $match;
             }
         }
 
         $this->path = $path;
+    }
+
+    protected function separator()
+    {
+        return '';
     }
 
     public function getRedirectPath()

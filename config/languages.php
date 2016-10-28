@@ -65,7 +65,10 @@ return [
      | # example: http://www.example.com/en/post/234
      |
      */
-     'pathRegExp' => '{\w+}\/.*',
+     'pathRegExp' => [
+         'reg' => '|([a-z]{2})(/.*)|ui',
+         'langPart' => 1,
+     ],
 
     /*
      |-----------------------------------------------------------------
@@ -76,6 +79,10 @@ return [
      | # example: http://www.example.en/post/234 => http://en.example.com/post/234
      |
      */
-    'domainRegExp' => 'http://{\w+}.example.com',
+    'domainRegExp' => [
+        'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
+        'langPart' => 2,
+        'domainSeparator' => '.',
+    ]
 
 ];

@@ -10,50 +10,33 @@
  * @author A.Zagovorichev <zagovorichev@gmail.com>
  */
 
-namespace zagovorichev\laravel\languages\Http\Middleware;
+namespace Zagovorichev\Laravel\Languages\Http\Middleware;
 
 
 use Closure;
+use Illuminate\Config\Repository;
+use Zagovorichev\Laravel\Languages\LanguageManager;
 
 class LanguagesMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request+
-     * @param  \Closure  $next
+     * @param  Request $request +
+     * @param  \Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-
-        config('languages');
-
-        /*$currentLang == $this->getLanguage();
-
-                    session()->put('lang', $lang);
-                    cookie('lang', $lang);
-
-                    \App::setLocale($lang);
-
-                $path = $request->path();
-                $params = $request->except(['lang']);
-                if (count($params)) {
-                    $path .= '?' .  http_build_query($params);
-                }
-
-                return redirect($path);*/
-
-    /*    protected function redirect($path='')
-    {
-        if (!function_exists('redirect')) {
-            throw new LanguageManagerException('Function redirect() does not exists, can\'t go to the path ' . $path);
+        $languageManager = new LanguageManager(new Repository(config('languages')));
+        if ($languageManager->isOtherLanguage()) {
+            return redirect($languageManager->getRedirectPath());
         }
 
-        if (!empty($path) && function_exists('redirect')) {
-            redirect($path);
+        if ($languageManager->has()) {
+            \App::setLocale($languageManager->get());
         }
-    }*/
+
         return $next($request);
     }
 }
