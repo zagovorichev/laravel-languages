@@ -13,21 +13,20 @@
 namespace Zagovorichev\Laravel\Languages;
 
 
+use Illuminate\Config\Repository;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
-use zagovorichev\laravel\languages\Http\Middleware\LanguagesMiddleware;
 
 class LanguageServiceProvider extends ServiceProvider
 {
     const CONFIG_NAME = 'languages';
-
-    protected $defer = false;
 
     /**
      * @var string
      */
     private $defaultConfigPath;
 
-    public function __construct($app)
+    public function __construct(Application $app)
     {
         parent::__construct($app);
 
@@ -39,55 +38,60 @@ class LanguageServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom($this->defaultConfigPath, self::CONFIG_NAME);
 
-        $this->app->singleton('languages', function ($app) {
-
-            $manager = new LanguageManager(config(self::CONFIG_NAME));
-
+        $this->app->singleton(LanguageManager::class, function ($app) {
+            $conf = new Repository(config(self::CONFIG_NAME));
+            $manager = new LanguageManager($conf);
             return $manager;
         });
     }
 
-    public function boot()
+/*
+ * TODO I must understand how I can place midleware into another group from the provider
+ *
+ * todo (then I can delete initialization from the app/Http/Kernel and I can use only provider initialization)
+ *
+ *
+ *
+ *     public function boot()
     {
         $this->publishes([$this->defaultConfigPath => $this->basePath()], 'config');
 
-        $languages = $this->app['languages'];
-        $languages->enable();
-        $languages->boot();
-
         $this->registerMiddleware(LanguagesMiddleware::class);
-    }
+    }*/
 
     /**
-     * Register the Debugbar Middleware
+     * Register the Languages Middleware should be in the web group
+     * in other case we can't write cookie, sessions etc.
      *
      * @param  string $middleware
      */
-    protected function registerMiddleware($middleware)
+/*    protected function registerMiddleware($middleware)
     {
         $kernel = $this->app['Illuminate\Contracts\Http\Kernel'];
-        $kernel->pushMiddleware($middleware);
-    }
+        if (!$kernel->hasMiddleware()){
+            $kernel->pushMiddleware($middleware);
+        }
+    }*/
 
     /**
      * Get the services provided by the provider.
      *
      * @return array
      */
-    public function provides()
+/*    public function provides()
     {
-        return ['languages'];
-    }
+        return [self::CONFIG_NAME];
+    }*/
 
-    private function basePath()
+/*    private function basePath()
     {
         $pubPath = '';
         if (function_exists('config_path')) {
-            $pubPath = config_path(self::CONFIG_FILENAME);
+            $pubPath = config_path(self::CONFIG_NAME);
         } elseif (function_exists('base_path')) {
-            $pubPath = base_path('config/' . self::CONFIG_FILENAME);
+            $pubPath = base_path('config/' . self::CONFIG_NAME);
         }
 
         return $pubPath;
-    }
+    }*/
 }

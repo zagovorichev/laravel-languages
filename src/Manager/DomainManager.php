@@ -24,4 +24,9 @@ class DomainManager extends PathManager
     {
         return $this->getConfig()->get('domainRegExp', '');
     }
+
+    protected function separator()
+    {
+        return $this->getConfig()->get('domainSeparator', '');
+    }
 }

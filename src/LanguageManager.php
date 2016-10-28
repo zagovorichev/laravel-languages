@@ -85,6 +85,33 @@ class LanguageManager extends Manager
         }
     }
 
+    public function isOtherLanguage()
+    {
+        $isOther = false;
+
+        $lang = $this->get();
+        //in request input
+        if ($this->getManager('request')->has()
+                && $this->filterLang($this->getManager('request')->get())) {
+
+            $lang = $this->filterLang($this->getManager('request')->get());
+            $isOther = true;
+        }
+
+        // if user go to the different domain we should use that language
+        if (in_array('domain', $this->modes) && $this->getManager('domain')->get() !== $this->get()) {
+
+            $lang = $this->getManager('domain')->get();
+            $isOther = true;
+        }
+
+        if ($isOther) {
+            $this->set($lang);
+        }
+
+        return $isOther;
+    }
+
     private function sortModes($modes)
     {
         $sorted = [];
@@ -132,7 +159,7 @@ class LanguageManager extends Manager
         return $lang;
     }
 
-    protected function filterLang($lang)
+    public function filterLang($lang)
     {
         $lang = parent::filterLang($lang);
         return $lang ? $lang : $this->getDefaultLanguage();
