@@ -15,6 +15,11 @@ namespace Zagovorichev\Laravel\Languages\Manager;
 
 class DomainManager extends PathManager
 {
+    protected function getModeName()
+    {
+        return 'domain';
+    }
+
     protected function getResource()
     {
         return $this->request->url();
@@ -27,6 +32,6 @@ class DomainManager extends PathManager
 
     protected function separator()
     {
-        return $this->getConfig()->get('domainSeparator', '');
+        return $this->getConfig()->get('domainRegExp.separator', '');
     }
 }

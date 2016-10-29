@@ -24,6 +24,11 @@ class SessionManager extends Manager
      */
     private $session;
 
+    protected function getModeName()
+    {
+        return 'session';
+    }
+
     public function __construct(Repository $config, $session = null)
     {
         parent::__construct($config);

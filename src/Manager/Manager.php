@@ -52,6 +52,16 @@ abstract class Manager implements LanguageManagerInterface
         }
     }
 
+    /**
+     * @return string
+     */
+    abstract protected function getModeName();
+
+    public function active()
+    {
+        return in_array($this->getModeName(), $this->getConfig()->get('modes'));
+    }
+
     private function setConfig(Repository $config)
     {
         $this->config = $config;
