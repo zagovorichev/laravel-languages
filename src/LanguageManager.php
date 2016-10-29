@@ -16,6 +16,7 @@ namespace Zagovorichev\Laravel\Languages;
 use Illuminate\Config\Repository;
 use Zagovorichev\Laravel\Languages\Manager\CookieManager;
 use Zagovorichev\Laravel\Languages\Manager\DomainManager;
+use Zagovorichev\Laravel\Languages\Manager\DomainMapManager;
 use Zagovorichev\Laravel\Languages\Manager\Manager;
 use Zagovorichev\Laravel\Languages\Manager\PathManager;
 use Zagovorichev\Laravel\Languages\Manager\RequestManager;
@@ -44,8 +45,8 @@ class LanguageManager extends Manager
         'session',
         'cookie',
         'path',
+        'domainMap',
         'domain', // low priority
-
     ];
 
     /**
@@ -58,6 +59,7 @@ class LanguageManager extends Manager
         'cookie' => CookieManager::class,
         'path' => PathManager::class,
         'domain' => DomainManager::class,
+        'domainMap' => DomainMapManager::class,
     ];
 
     /**
@@ -83,6 +85,11 @@ class LanguageManager extends Manager
         if ($this->getConfig()->has('modes')) {
             $this->modes = $this->sortModes($this->getConfig()->get('modes'));
         }
+    }
+
+    protected function getModeName()
+    {
+        return 'languageManager';
     }
 
     public function isOtherLanguage()
@@ -181,8 +188,7 @@ class LanguageManager extends Manager
     {
         $lang = false;
         foreach ($this->modes as $mode) {
-            $lang = $this->getManager($mode)->has();
-            if ($lang) {
+            if ( $lang = $this->getManager($mode)->has() ) {
                 break;
             }
         }
@@ -192,8 +198,17 @@ class LanguageManager extends Manager
 
     public function getRedirectPath()
     {
-        $domain = $this->getManager('domain')->getRedirectPath();
-        $path = $this->getManager('path')->getRedirectPath();
+        $domain = $path = '';
+        if ($this->getManager('domainMap')->active()) {
+            $domain = $this->getManager('domainMap')->getRedirectPath();
+        }
+        if (!$domain && $this->getManager('domain')->active()) {
+            $domain = $this->getManager('domain')->getRedirectPath();
+        }
+        if ($this->getManager('path')->active()) {
+            $path = $this->getManager('path')->getRedirectPath();
+        }
+
         $request = $this->getManager('request')->getRedirectPath();
 
         return $domain . $path . $request;

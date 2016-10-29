@@ -19,6 +19,11 @@ class PathManager extends RequestManager
 {
     protected $path = '';
 
+    protected function getModeName()
+    {
+        return 'path';
+    }
+
     protected function getResource()
     {
         return $this->request->path();
@@ -32,7 +37,8 @@ class PathManager extends RequestManager
     public function get()
     {
         $lang = false;
-        if ($this->getRegExp() && !empty($this->getRegExp()['reg']) && preg_match($this->getRegExp()['reg'], $this->getResource(), $match) !== false) {
+        if ($this->getRegExp() && !empty($this->getRegExp()['reg'])
+            && preg_match($this->getRegExp()['reg'], $this->getResource(), $match) !== false) {
             if (isset($match[$this->getRegExp()['langPart']])) {
                 $lang = $this->filterLang($match[$this->getRegExp()['langPart']]);
             }

@@ -38,6 +38,11 @@ class CookieManager extends Manager
         }
     }
 
+    protected function getModeName()
+    {
+        return 'cookie';
+    }
+
     public function get()
     {
         return call_user_func([$this->cookie, 'get'], self::LANG, false);

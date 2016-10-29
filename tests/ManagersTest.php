@@ -17,6 +17,7 @@ use Illuminate\Config\Repository;
 use Zagovorichev\Laravel\Languages\LanguageManagerInterface;
 use Zagovorichev\Laravel\Languages\Manager\CookieManager;
 use Zagovorichev\Laravel\Languages\Manager\DomainManager;
+use Zagovorichev\Laravel\Languages\Manager\DomainMapManager;
 use Zagovorichev\Laravel\Languages\Manager\PathManager;
 use Zagovorichev\Laravel\Languages\Manager\RequestManager;
 use Zagovorichev\Laravel\Languages\Manager\SessionManager;
@@ -118,8 +119,9 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
 
         // RegEx from configuration file
         $this->config->set('domainRegExp', [
-            'reg' => '|^(http://)([a-z]{2})([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
-            'langPart' => 2
+            'reg' => '|^(http://)([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
+            'langPart' => 2,
+            'separator' => '.',
         ]);
 
         $manager = new DomainManager($this->config, $mock);
@@ -137,7 +139,8 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
         // RegEx from configuration file
         $this->config->set('domainRegExp', [
             'reg' => '|^(http://province\.)([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
-            'langPart' => 2
+            'langPart' => 2,
+            'separator' => '.',
         ]);
 
         $manager = new DomainManager($this->config, $mock);
@@ -145,5 +148,24 @@ class ManagersTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $manager->get());
         $manager->set('es');
         $this->assertEquals('http://province.es.example.com/something/else', $manager->getRedirectPath());
+    }
+
+    public function testDomainMapManager()
+    {
+        $mock = new RequestMock();
+        $mock->setUrl('http://www.example.com/something/else');
+
+        // RegEx from configuration file
+        $this->config->set('domainMap', [
+            'en' => 'www.example.com',
+            'es' => 'es.example.com',
+            'ua' => 'www.example.ua',
+        ]);
+
+        $manager = new DomainMapManager($this->config, $mock);
+        $this->assertTrue($manager->has());
+        $this->assertEquals('en', $manager->get());
+        $manager->set('es');
+        $this->assertEquals('http://es.example.com/something/else', $manager->getRedirectPath());
     }
 }

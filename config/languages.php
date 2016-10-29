@@ -82,9 +82,8 @@ return [
     'domainRegExp' => [
         'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
         'langPart' => 2,
+        'separator' => '.',
     ],
-
-    'domainSeparator' => '.',
 
     /*
      |-----------------------------------------------------------------

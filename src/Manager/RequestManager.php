@@ -21,6 +21,11 @@ class RequestManager extends Manager
 
     protected $request;
 
+    protected function getModeName()
+    {
+        return 'request';
+    }
+
     public function __construct(Repository $config, $request = null)
     {
         parent::__construct($config);

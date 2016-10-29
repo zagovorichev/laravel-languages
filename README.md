@@ -70,6 +70,8 @@ For using DomainMapManger in your configuration file you should matched language
 ],
 ```
 
+> :warning: **Notice**: Please, use only DomainMap or Domain modes, otherwise the behaviour will be unpredictable.
+
 #### Domain 
 
 Also you can provide regular expression in the configuration file.
@@ -83,6 +85,8 @@ Also you can provide regular expression in the configuration file.
 
 And as a result you will have
 `http://www.example.en/post/234 => http://en.example.com/post/234 => http://es.example.com/post/234`
+
+> :warning: **Notice**: Please, use only DomainMap or Domain modes, otherwise the behaviour will be unpredictable.
 
 #### Path
 Similar to domains, you can provide regular expression:
@@ -101,6 +105,7 @@ Each store has its own manager.
 
 - **session** - store in the $_SESSION  
 - **cookie** - store in the browser $_COOKIES  
+- **domainMap** - you can define map if you have different domain which can't be described with simple regular expression 
 - **domain** - use domain name for determining current language (www.example.com, en.example.com, es.example.com...)  
 - **path** - use uri for language example.com/en/address
 
