@@ -73,8 +73,9 @@ class LanguageManagerTest extends \PHPUnit_Framework_TestCase
 
         // RegEx from configuration file
         $this->config->set('domainRegExp', [
-            'reg' => '|^(http://)([a-z]{2})([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
-            'langPart' => 2
+            'reg' => '|^(http://)([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
+            'langPart' => 2,
+            'separator' => '.',
         ]);
 
         $languageManager = new LanguageManager($this->config);
@@ -185,15 +186,17 @@ class LanguageManagerTest extends \PHPUnit_Framework_TestCase
             'path',
             'domain',
             'session',
-            'request'
+            'request',
+            'domainMap',
         ]);
 
         $this->request->setUrl('http://es.example.com/');
 
         // RegEx from configuration file
         $this->config->set('domainRegExp', [
-            'reg' => '|^(http://)([a-z]{2})([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
-            'langPart' => 2
+            'reg' => '|^(http://)([a-z]{2})[\.]{0,1}(example\.com.*)$|ui',
+            'langPart' => 2,
+            'separator' => '.',
         ]);
 
         $this->request->setPath('ua/bar/foo');
@@ -202,6 +205,13 @@ class LanguageManagerTest extends \PHPUnit_Framework_TestCase
         $this->config->set('pathRegExp', [
             'reg' => '|([a-z]{2})(/.*)|ui',
             'langPart' => 1,
+        ]);
+
+        // Can't use both of the domain and domainMap (for now it haven't any sense)
+        $this->config->set('domainMap', [
+            'it' => 'it.example.com',
+            'es' => 'es.example.com',
+            'az' => 'vvv.another.az',
         ]);
 
         cookie(LanguageManagerInterface::LANG, 'ch');
@@ -226,5 +236,12 @@ class LanguageManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('it', call_user_func([$this->cookie, 'get'], LanguageManagerInterface::LANG, false));
 
         $this->assertEquals('http://it.example.com/it/bar/foo?param1=1&param2=2', $languageManager->getRedirectPath());
+
+        $languageManager->set('az');
+
+        $this->assertEquals('az', $this->session->get(LanguageManagerInterface::LANG, false));
+        $this->assertEquals('az', call_user_func([$this->cookie, 'get'], LanguageManagerInterface::LANG, false));
+
+        $this->assertEquals('http://vvv.another.az/az/bar/foo?param1=1&param2=2', $languageManager->getRedirectPath());
     }
 }

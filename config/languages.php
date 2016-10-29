@@ -82,7 +82,21 @@ return [
     'domainRegExp' => [
         'reg' => '|^(http://)([a-z]{2})(\.example\.com.*)$|ui',
         'langPart' => 2,
-        'domainSeparator' => '.',
-    ]
+        'separator' => '.',
+    ],
+
+    /*
+     |-----------------------------------------------------------------
+     | DomainMap manager configuration
+     |-----------------------------------------------------------------
+     |
+     | You can identify which language will use which domain
+     |
+     */
+    'domainMap' => [
+        'en' => 'www.example.com',
+        'es' => 'es.example.com',
+        'ua' => 'www.example.ua',
+    ],
 
 ];
