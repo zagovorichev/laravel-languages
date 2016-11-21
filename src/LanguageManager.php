@@ -113,8 +113,7 @@ class LanguageManager extends Manager
         }
 
         // if user go to the different domain we should use that language
-        if (in_array('domainMap', $this->modes) && $this->getManager('domainMap')->get() !== $this->get()) {
-
+        if (in_array('domainMap', $this->modes) && $this->getManager('domainMap')->get() && $this->getManager('domainMap')->get() !== $this->get()) {
             $lang = $this->getManager('domainMap')->get();
             $isOther = true;
         }

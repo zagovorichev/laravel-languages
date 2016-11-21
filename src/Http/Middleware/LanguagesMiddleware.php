@@ -15,6 +15,7 @@ namespace Zagovorichev\Laravel\Languages\Http\Middleware;
 
 use Closure;
 use Illuminate\Config\Repository;
+use Illuminate\Support\Facades\Log;
 use Zagovorichev\Laravel\Languages\LanguageManager;
 
 class LanguagesMiddleware
@@ -30,6 +31,7 @@ class LanguagesMiddleware
     {
         $languageManager = new LanguageManager(new Repository(config('languages')));
         if ($languageManager->isOtherLanguage()) {
+            Log::info('Languages middleware redirects app to the new language');
             return redirect($languageManager->getRedirectPath());
         }
 
