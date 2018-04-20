@@ -14,6 +14,7 @@ namespace Zagovorichev\Laravel\Languages\tests;
 
 
 use Illuminate\Config\Repository;
+use PHPUnit\Framework\TestCase;
 use Zagovorichev\Laravel\Languages\LanguageManagerInterface;
 use Zagovorichev\Laravel\Languages\Manager\CookieManager;
 use Zagovorichev\Laravel\Languages\Manager\DomainManager;
@@ -27,7 +28,7 @@ use Zagovorichev\Laravel\Languages\tests\mocks\SessionMock;
 
 require_once __DIR__ . "/mocks/cookie.php";
 
-class ManagersTest extends \PHPUnit_Framework_TestCase
+class ManagersTest extends TestCase
 {
     /**
      * @var Repository
