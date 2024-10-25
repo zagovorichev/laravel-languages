@@ -5,16 +5,19 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * MIT Public License for more details.
  *
- * Copyright (c) 2016. (original work) Blog-Tree.com;
+ * Copyright (c) 2016. (original work)
  *
  * @author A.Zagovorichev <zagovorichev@gmail.com>
  */
+
+declare(strict_types=1);
 
 namespace Zagovorichev\Laravel\Languages\tests;
 
 
 use Illuminate\Config\Repository;
 use PHPUnit\Framework\TestCase;
+use Zagovorichev\Laravel\Languages\LanguageManagerException;
 use Zagovorichev\Laravel\Languages\LanguageManagerInterface;
 use Zagovorichev\Laravel\Languages\Manager\CookieManager;
 use Zagovorichev\Laravel\Languages\Manager\DomainManager;
@@ -30,12 +33,9 @@ require_once __DIR__ . "/mocks/cookie.php";
 
 class ManagersTest extends TestCase
 {
-    /**
-     * @var Repository
-     */
-    private $config;
+    private Repository $config;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -52,18 +52,27 @@ class ManagersTest extends TestCase
         $this->assertTrue($manager->has());
     }
 
+    /**
+     * @throws LanguageManagerException
+     */
     public function testSessionManager()
     {
         $manager = new SessionManager($this->config, new SessionMock() );
         $this->managerTest($manager);
     }
 
+    /**
+     * @throws LanguageManagerException
+     */
     public function testCookieManager()
     {
         $manager = new CookieManager($this->config, CookieMock::class );
         $this->managerTest($manager);
     }
 
+    /**
+     * @throws LanguageManagerException
+     */
     public function testRequestManager()
     {
         $mock = new RequestMock();
@@ -77,6 +86,9 @@ class ManagersTest extends TestCase
         $this->assertEquals('fr', $manager->get());
     }
 
+    /**
+     * @throws LanguageManagerException
+     */
     public function testPathManager()
     {
         $mock = new RequestMock();
@@ -95,6 +107,9 @@ class ManagersTest extends TestCase
         $this->assertEquals('es/bar/foo', $manager->getRedirectPath());
     }
 
+    /**
+     * @throws LanguageManagerException
+     */
     public function testPathManager2()
     {
         $mock = new RequestMock();
@@ -113,6 +128,9 @@ class ManagersTest extends TestCase
         $this->assertEquals('posts/es/12345/art', $manager->getRedirectPath());
     }
 
+    /**
+     * @throws LanguageManagerException
+     */
     public function testDomainManager()
     {
         $mock = new RequestMock();
@@ -132,6 +150,9 @@ class ManagersTest extends TestCase
         $this->assertEquals('http://es.example.com/something/else', $manager->getRedirectPath());
     }
 
+    /**
+     * @throws LanguageManagerException
+     */
     public function testDomainManager2()
     {
         $mock = new RequestMock();
@@ -151,6 +172,9 @@ class ManagersTest extends TestCase
         $this->assertEquals('http://province.es.example.com/something/else', $manager->getRedirectPath());
     }
 
+    /**
+     * @throws LanguageManagerException
+     */
     public function testDomainMapManager()
     {
         $mock = new RequestMock();

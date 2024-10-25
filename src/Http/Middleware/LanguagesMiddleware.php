@@ -5,7 +5,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * MIT Public License for more details.
  *
- * Copyright (c) 2016. (original work) Blog-Tree.com;
+ * Copyright (c) 2016. (original work)
  *
  * @author A.Zagovorichev <zagovorichev@gmail.com>
  */
@@ -32,7 +32,8 @@ class LanguagesMiddleware
         $languageManager = new LanguageManager(new Repository(config('languages')));
         if ($languageManager->isOtherLanguage()) {
             Log::info('Languages middleware redirects app to the new language');
-            return redirect($languageManager->getRedirectPath());
+            return redirect($languageManager->getRedirectPath())
+                ->withCookie($languageManager->getCookie());
         }
 
         if ($languageManager->has()) {

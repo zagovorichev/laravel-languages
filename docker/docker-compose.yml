@@ -1,0 +1,10 @@
+name: laravel-languages
+
+services:
+    laravel-languages-phpfpm:
+        container_name: laravel-languages-phpfpm
+        build:
+            context: ./phpfpm
+        volumes:
+            - ..:/var/www/html:cached
+        working_dir: /var/www/html

@@ -5,7 +5,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * MIT Public License for more details.
  *
- * Copyright (c) 2016 (original work) Blog-Tree.com;
+ * Copyright (c) 2016 (original work)
  *
  * @author A.Zagovorichev <zagovorichev@gmail.com>
  */

@@ -36,6 +36,6 @@
     "illuminate/container": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "^8.5"
+    "phpunit/phpunit": "^11.2.9"
   }
 }
