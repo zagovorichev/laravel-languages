@@ -2,6 +2,7 @@
   "name": "zagovorichev/laravel-languages",
   "description": "Using different languages in the Laravel",
   "minimum-stability": "dev",
+  "prefer-stable": true,
   "license": ["MIT"],
   "authors": [
     {
@@ -31,9 +32,9 @@
     }
   },
   "require": {
-    "illuminate/support": "*",
-    "illuminate/config": "*",
-    "illuminate/container": "*"
+    "illuminate/support": "^10|^11|^12",
+    "illuminate/config": "^10|^11|^12",
+    "illuminate/container": "^10|^11|^12"
   },
   "require-dev": {
     "phpunit/phpunit": "^11.2.9"
